@@ -1,7 +1,9 @@
 from flask import Flask, request
 import sqlite3
 from pathlib import Path
-
+import os
+from dotenv import load_dotenv
+from helpers.helpers import route_request, response_parser
 
 app = Flask(__name__)
 
@@ -11,15 +13,27 @@ src_folder = FILE.parents[0]
 rel_arquivo_db = Path('db/maps.db')
 db = Path(src_folder / rel_arquivo_db).resolve()
 
+# Obtendo API_KEY do .env
+load_dotenv()
+api_key = os.getenv("API_KEY")
+
+
 
 @app.route('/rota', methods=['POST'])
 def rota():
     #Obtendo dados do POST
     data = request.get_json()
-    print(data)
 
     #Criando a conexão com o banco de dados
     conn = sqlite3.connect(db)
+
+    # Fazendo a requisição na API do Google Maps
+    response = route_request(data['LatitudeOrigem'], data['LongitudeOrigem'],data['LatitudeDestino'],data['LongitudeDestino'],data['TravelMode'], api_key)
+    print(response)
+
+    #Parseando a resposta
+    parsed_response = response_parser(response)
+
 
     #Inserindo dados na tabela
     conn.execute('''INSERT INTO MinhaTabela (
@@ -37,9 +51,9 @@ def rota():
         data['LatitudeDestino'],
         data['LongitudeDestino'],
         data['TravelMode'],
-        data['EncodedRoutes'],
-        data['DistanceMeters'],
-        data['Duration']
+        parsed_response['EncodedRoutes'][0],
+        parsed_response['DistanceMeters'][0],
+        parsed_response['Duration'][0]
     ))
 
     #Salva as alterações
@@ -81,7 +95,6 @@ def rotas():
 
     #Fecha a conexão
     conn.close()
-
     #Retorna lista de rotas
     return {'rotas': rotas}
 
