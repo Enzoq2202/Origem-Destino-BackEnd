@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from helpers.helpers import route_request, response_parser
+from flask import request
 
 app = Flask(__name__)
 
@@ -71,27 +72,40 @@ def rotas():
 
     #Obtendo dados da tabela
     cursor = conn.execute('''SELECT * FROM MinhaTabela''')
+    
+    #Obtendo os valor dos parâmetro da query
+    travel_mode = request.args.get('travel_mode')
+ 
+    duration_max = request.args.get('duration_max')
 
+    duration_min= request.args.get('duration_min')
     #Criando lista de rotas
     rotas = []
 
     #Percorrendo dados da tabela
     for row in cursor:
-        #Criando dicionário de rota
-        rota = {
-            'id': row[0],
-            'latitudeOrigem': row[1],
-            'longitudeOrigem': row[2],
-            'latitudeDestino': row[3],
-            'longitudeDestino': row[4],
-            'travelMode': row[5],
-            'encodedRoutes': row[6],
-            'distanceMeters': row[7],
-            'duration': row[8]
-        }
+        # filtrnado por modo de viagem
+        if travel_mode is None or travel_mode == row[5]:
+            # filtrando por duração minimia
+            if duration_min == None or duration_min <= row[8]:
+                # filtrando por duração máxima
+                if duration_max == None or duration_max >= row[8]:
+        
+                    #Criando dicionário de rota
+                    rota = {
+                        'id': row[0],
+                        'latitudeOrigem': row[1],
+                        'longitudeOrigem': row[2],
+                        'latitudeDestino': row[3],
+                        'longitudeDestino': row[4],
+                        'travelMode': row[5],
+                        'encodedRoutes': row[6],
+                        'distanceMeters': row[7],
+                        'duration': row[8]
+                    }
 
-        #Adicionando rota na lista de rotas
-        rotas.append(rota)
+                    #Adicionando rota na lista de rotas
+                    rotas.append(rota)
 
     #Fecha a conexão
     conn.close()
