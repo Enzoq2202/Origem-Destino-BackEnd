@@ -6,8 +6,10 @@ from dotenv import load_dotenv
 from helpers.helpers import route_request, response_parser
 import simplekml
 from fastkml import kml
+from flask_cors import CORS  
 
 app = Flask(__name__)
+CORS(app)
 
 #Obtendo Path do DB
 FILE = Path(__file__).resolve()
