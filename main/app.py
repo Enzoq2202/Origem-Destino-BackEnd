@@ -4,6 +4,8 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from helpers.helpers import route_request, response_parser
+import simplekml
+from fastkml import kml
 
 app = Flask(__name__)
 
@@ -98,7 +100,34 @@ def rotas():
     #Retorna lista de rotas
     return {'rotas': rotas}
 
+# ------------------------------------------------- #
 
+@app.route('/areas', methods=['GET'])
+def kml_areas():
+
+    kml_file = 'main/db/LL_WGS84_KMZ_distrito.kml'
+
+    with open(kml_file, 'rb') as f:
+        kml_document = f.read()
+
+    k = kml.KML()
+    k.from_string(kml_document)
+
+    placemarks = []
+    root = list(k.features())[0]  # Access the root feature (Document)
+    folder = list(root.features())[0]  # Access the first nested feature (Folder)
+    for feature in folder.features():  # Iterate over features within the nested Folder
+        if isinstance(feature, kml.Placemark):
+            placemarks.append(feature)
+
+    areas = []
+    for placemark in placemarks:
+        newArea = {}
+        newArea['name'] = placemark.name
+        newArea['coords'] = list(placemark.geometry.exterior.coords)
+        areas.append(newArea)
+
+    return { 'areas': areas }
 
 if __name__ == '__main__':
     app.run(debug=True)
