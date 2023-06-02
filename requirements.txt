@@ -2,3 +2,5 @@ redis
 flask
 requests
 python-dotenv
+fastkml
+shapely
