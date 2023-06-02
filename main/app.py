@@ -4,8 +4,9 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from helpers.helpers import route_request, response_parser
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 #Obtendo Path do DB
 FILE = Path(__file__).resolve()
