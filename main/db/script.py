@@ -11,6 +11,7 @@ conn.execute('''CREATE TABLE MinhaTabela (
     LatitudeDestino REAL,
     LongitudeDestino REAL,
     TravelMode TEXT,
+    Area TEXT,
     EncodedRoutes TEXT,
     DistanceMeters REAL,
     Duration TEXT

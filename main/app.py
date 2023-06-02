@@ -33,7 +33,6 @@ def rota():
 
     # Fazendo a requisição na API do Google Maps
     response = route_request(data['LatitudeOrigem'], data['LongitudeOrigem'],data['LatitudeDestino'],data['LongitudeDestino'],data['TravelMode'], api_key)
-    print(response)
 
     #Parseando a resposta
     parsed_response = response_parser(response)
@@ -54,7 +53,7 @@ def rota():
         LatitudeDestino,
         LongitudeDestino,
         TravelMode,
-        Area
+        Area,
         EncodedRoutes,
         DistanceMeters,
         Duration
