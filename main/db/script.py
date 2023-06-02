@@ -2,7 +2,7 @@ import sqlite3
 
 
 # Criando a conexão com o banco de dados
-conn = sqlite3.connect('maps.db')
+conn = sqlite3.connect('main/db/maps.db')
 
 conn.execute('''CREATE TABLE MinhaTabela (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11,10 +11,10 @@ conn.execute('''CREATE TABLE MinhaTabela (
     LatitudeDestino REAL,
     LongitudeDestino REAL,
     TravelMode TEXT,
-    Area TEXT,
     EncodedRoutes TEXT,
     DistanceMeters REAL,
-    Duration TEXT
+    Duration TEXT,
+    Area TEXT
 );''')
 
 

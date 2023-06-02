@@ -53,20 +53,20 @@ def rota():
         LatitudeDestino,
         LongitudeDestino,
         TravelMode,
-        Area,
         EncodedRoutes,
         DistanceMeters,
-        Duration
-    ) VALUES (?,?,?,?,?,?,?,?)''', (
+        Duration,
+        Area
+    ) VALUES (?,?,?,?,?,?,?,?,?)''', (
         data['LatitudeOrigem'],
         data['LongitudeOrigem'],
         data['LatitudeDestino'],
         data['LongitudeDestino'],
         data['TravelMode'],
-        areaName,
         parsed_response['EncodedRoutes'][0],
         parsed_response['DistanceMeters'][0],
-        parsed_response['Duration'][0]
+        parsed_response['Duration'][0],
+        areaName
     ))
 
     #Salva as alterações
