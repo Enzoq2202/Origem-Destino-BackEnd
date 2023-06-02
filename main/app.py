@@ -40,11 +40,12 @@ def rota():
     # Verificando região
     p1 = Point( data['LatitudeOrigem'], data['LongitudeOrigem'])
     areaName = 'none'
-    # respArea = kml_areas()['areas']
-    # for area in respArea['areas']:
-    #     poly = Polygon(area['coords'])
-    #     if p1.within(poly):
-    #         areaName = area['name']
+    respArea = kml_areas()['areas']
+    for area in respArea:
+        poly = Polygon(area['coords'])
+        print(area['name'])
+        if poly.contains(p1):
+            areaName = area['name']
 
     #Inserindo dados na tabela
     conn.execute('''INSERT INTO MinhaTabela (
@@ -100,7 +101,8 @@ def rotas():
             'travelMode': row[5],
             'encodedRoutes': row[6],
             'distanceMeters': row[7],
-            'duration': row[8]
+            'duration': row[8],
+            'area': row[9]
         }
 
         #Adicionando rota na lista de rotas
