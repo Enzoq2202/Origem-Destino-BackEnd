@@ -4,9 +4,9 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from helpers.helpers import route_request, response_parser
-import simplekml
 from fastkml import kml
 from flask_cors import CORS  
+from shapely.geometry import Point, Polygon
 
 app = Flask(__name__)
 CORS(app)
@@ -38,6 +38,14 @@ def rota():
     #Parseando a resposta
     parsed_response = response_parser(response)
 
+    # Verificando região
+    p1 = Point( data['LatitudeOrigem'], data['LongitudeOrigem'])
+    areaName = 'none'
+    # respArea = kml_areas()['areas']
+    # for area in respArea['areas']:
+    #     poly = Polygon(area['coords'])
+    #     if p1.within(poly):
+    #         areaName = area['name']
 
     #Inserindo dados na tabela
     conn.execute('''INSERT INTO MinhaTabela (
@@ -46,6 +54,7 @@ def rota():
         LatitudeDestino,
         LongitudeDestino,
         TravelMode,
+        Area
         EncodedRoutes,
         DistanceMeters,
         Duration
@@ -55,6 +64,7 @@ def rota():
         data['LatitudeDestino'],
         data['LongitudeDestino'],
         data['TravelMode'],
+        areaName,
         parsed_response['EncodedRoutes'][0],
         parsed_response['DistanceMeters'][0],
         parsed_response['Duration'][0]
