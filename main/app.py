@@ -37,14 +37,23 @@ def rota():
     #Parseando a resposta
     parsed_response = response_parser(response)
 
-    # Verificando região
-    p1 = Point( data['LatitudeOrigem'], data['LongitudeOrigem'])
-    areaName = 'none'
-    # respArea = kml_areas()['areas']
-    # for area in respArea['areas']:
-    #     poly = Polygon(area['coords'])
-    #     if p1.within(poly):
-    #         areaName = area['name']
+    # Verificando região origem
+    p1 = Point( data['LongitudeOrigem'], data['LatitudeOrigem'])
+    areaOrig = 'none'
+    respArea = kml_areas()['areas']
+    for area in respArea:
+        poly = Polygon(area['coords'])
+        if poly.contains(p1):
+            areaOrig = area['name']
+
+    # Verificando região destino
+    p2 = Point( data['LongitudeDestino'], data['LatitudeDestino'])
+    areaDest = 'none'
+    respArea = kml_areas()['areas']
+    for area in respArea:
+        poly = Polygon(area['coords'])
+        if poly.contains(p2):
+            areaDest = area['name']
 
     #Inserindo dados na tabela
     conn.execute('''INSERT INTO MinhaTabela (
@@ -56,8 +65,9 @@ def rota():
         EncodedRoutes,
         DistanceMeters,
         Duration,
-        Area
-    ) VALUES (?,?,?,?,?,?,?,?,?)''', (
+        AreaOrigem,
+        AreaDestino
+    ) VALUES (?,?,?,?,?,?,?,?,?,?)''', (
         data['LatitudeOrigem'],
         data['LongitudeOrigem'],
         data['LatitudeDestino'],
@@ -66,7 +76,8 @@ def rota():
         parsed_response['EncodedRoutes'][0],
         parsed_response['DistanceMeters'][0],
         parsed_response['Duration'][0],
-        areaName
+        areaOrig,
+        areaDest
     ))
 
     #Salva as alterações
@@ -100,7 +111,9 @@ def rotas():
             'travelMode': row[5],
             'encodedRoutes': row[6],
             'distanceMeters': row[7],
-            'duration': row[8]
+            'duration': row[8],
+            'areaOrigem': row[9],
+            'areaDestino': row[10]
         }
 
         #Adicionando rota na lista de rotas
@@ -134,7 +147,7 @@ def kml_areas():
     areas = []
     for placemark in placemarks:
         newArea = {}
-        newArea['name'] = str(placemark.name)
+        newArea['name'] = str(placemark.extended_data.elements[0].data[0]['value']) + ' - ' + str(placemark.extended_data.elements[0].data[3]['value']) 
         newArea['coords'] = list(placemark.geometry.exterior.coords)
         areas.append(newArea)
 

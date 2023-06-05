@@ -14,7 +14,8 @@ conn.execute('''CREATE TABLE MinhaTabela (
     EncodedRoutes TEXT,
     DistanceMeters REAL,
     Duration TEXT,
-    Area TEXT
+    AreaOrigem TEXT,
+    AreaDestino TEXT
 );''')
 
 
