@@ -93,33 +93,43 @@ def rota():
 def rotas():
     #Criando a conexão com o banco de dados
     conn = sqlite3.connect(db)
-
     #Obtendo dados da tabela
     cursor = conn.execute('''SELECT * FROM MinhaTabela''')
-
+    
+    #Obtendo os valor dos parâmetro da query
+    travel_mode = request.args.get('travel_mode')
+ 
+    duration_max = request.args.get('duration_max')
+    duration_min= request.args.get('duration_min')
     #Criando lista de rotas
     rotas = []
-
     #Percorrendo dados da tabela
     for row in cursor:
-        #Criando dicionário de rota
-        rota = {
-            'id': row[0],
-            'latitudeOrigem': row[1],
-            'longitudeOrigem': row[2],
-            'latitudeDestino': row[3],
-            'longitudeDestino': row[4],
-            'travelMode': row[5],
-            'encodedRoutes': row[6],
-            'distanceMeters': row[7],
-            'duration': row[8],
-            'areaOrigem': row[9],
-            'areaDestino': row[10]
-        }
+        # filtrnado por modo de viagem
+        if travel_mode is None or travel_mode == row[5]:
+            # filtrando por duração minimia
+            if duration_min == None or duration_min <= row[8]:
+                # filtrando por duração máxima
+                if duration_max == None or duration_max >= row[8]:
+        
+                    #Criando dicionário de rota
+                    rota = {
+                        'id': row[0],
+                        'latitudeOrigem': row[1],
+                        'longitudeOrigem': row[2],
+                        'latitudeDestino': row[3],
+                        'longitudeDestino': row[4],
+                        'travelMode': row[5],
+                        'encodedRoutes': row[6],
+                        'distanceMeters': row[7],
+                        'duration': row[8],
+                        "area": row[9],
+                    }
 
-        #Adicionando rota na lista de rotas
-        rotas.append(rota)
+                    #Adicionando rota na lista de rotas
 
+
+                    rotas.append(rota)
     #Fecha a conexão
     conn.close()
     #Retorna lista de rotas
@@ -130,7 +140,7 @@ def rotas():
 @app.route('/areas', methods=['GET'])
 def kml_areas():
 
-    kml_file = 'main/db/LL_WGS84_KMZ_distrito.kml'
+    kml_file = '/Users/tomasalessi/insper 20.27.08 20.27.08 20.27.08/Sprint-Session/Origem-Destino-BackEnd/main/db/LL_WGS84_KMZ_distrito.kml'
 
     with open(kml_file, 'rb') as f:
         kml_document = f.read()
