@@ -96,7 +96,13 @@ def rotas():
 
     #Obtendo dados da tabela
     cursor = conn.execute('''SELECT * FROM MinhaTabela''')
+    
+    #Obtendo os valor dos parâmetro da query
+    travel_mode = request.args.get('travel_mode')
+ 
+    duration_max = request.args.get('duration_max')
 
+    duration_min= request.args.get('duration_min')
     #Criando lista de rotas
     rotas = []
 
