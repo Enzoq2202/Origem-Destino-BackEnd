@@ -23,6 +23,7 @@ load_dotenv()
 api_key = os.getenv("API_KEY")
 
 
+# ------------------------------------------------- #
 
 @app.route('/rota', methods=['POST'])
 def rota():
@@ -106,6 +107,7 @@ def rota():
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
+# ------------------------------------------------- #
 
 @app.route('/rota', methods=['GET'])
 def rotas():
@@ -144,7 +146,8 @@ def rotas():
                         'encodedRoutes': row[6],
                         'distanceMeters': row[7],
                         'duration': row[8],
-                        "area": row[9],
+                        'areaOrigem': row[9],
+                        'areaDestino': row[10]
                     }
 
                     # Adicionando rota na lista de rotas
@@ -159,13 +162,12 @@ def rotas():
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
-
 # ------------------------------------------------- #
 
 @app.route('/areas', methods=['GET'])
 def kml_areas():
 
-    kml_file = '/Users/tomasalessi/insper 20.27.08 20.27.08 20.27.08/Sprint-Session/Origem-Destino-BackEnd/main/db/LL_WGS84_KMZ_distrito.kml'
+    kml_file = 'main\db\LL_WGS84_KMZ_distrito.kml'
 
     with open(kml_file, 'rb') as f:
         kml_document = f.read()
@@ -226,6 +228,47 @@ def delete_todas_rotas():
     conn.close()
 
     return "Todas as rotas foram deletadas com sucesso!"
+
+# ------------------------------------------------- #
+
+@app.route('/macro', methods=['GET'])
+def macroAreas():
+
+    areasDict = kml_areas()["areas"]
+    midpoints = {}
+    for area in areasDict:
+        poly = Polygon(area['coords'])
+        point = poly.centroid
+        midpoints[area['name']] = [point.x, point.y]
+
+    conn = sqlite3.connect(db)
+    cursor = conn.execute('''SELECT * FROM MinhaTabela''')
+
+    areaRoutes = []
+    haveRoute = []
+    for row in cursor:
+
+        start = row[9]
+        end = row[10]
+
+        if (start != end) and (start != 'none') and (end != 'none'):
+            startCoords = midpoints[start]
+            endCoords = midpoints[end]
+
+            # midpoint and offset calcs here ================ TODO
+
+            path = [startCoords, endCoords]
+            if path not in haveRoute:
+                haveRoute.append(path)
+                newDict = {'route': path, 'name': (start+" // "+end), 'people':1}
+                areaRoutes.append(newDict)
+            else:
+                for items in areaRoutes:
+                    if items['route'] == path:
+                        items['people'] += 1
+
+    conn.close()
+    return {'routes': areaRoutes}
 
 # ------------------------------------------------- #
 
