@@ -140,9 +140,6 @@ def kml_areas():
 
     return { 'areas': areas }
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
 # ------------------------------------------------- #
 
 app.route('/rota/<int:id>/', methods=['DELETE'])
@@ -160,6 +157,8 @@ def delete_rota(id):
     conn.close()
 
     return "Rota deletada com sucesso!"
+
+app.add_url_rule('/rota/<int:id>/', view_func=delete_rota, methods=['DELETE'])
 
 # ------------------------------------------------- #
 
@@ -181,4 +180,5 @@ def delete_todas_rotas():
 
 # ------------------------------------------------- #
 
-
+if __name__ == '__main__':
+    app.run(debug=True)
