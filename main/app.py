@@ -38,7 +38,7 @@ def rota():
     parsed_response = response_parser(response)
 
     # Verificando região
-    p1 = Point( data['LatitudeOrigem'], data['LongitudeOrigem'])
+    p1 = Point( data['LongitudeOrigem'], data['LatitudeOrigem'])
     areaName = 'none'
     respArea = kml_areas()['areas']
     for area in respArea:
