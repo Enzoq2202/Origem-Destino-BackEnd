@@ -8,6 +8,7 @@ from fastkml import kml
 from flask_cors import CORS  
 from shapely.geometry import Point, Polygon
 
+print('Iniciando API...')
 app = Flask(__name__)
 CORS(app)
 
