@@ -136,7 +136,7 @@ def kml_areas():
     areas = []
     for placemark in placemarks:
         newArea = {}
-        newArea['name'] = str(placemark.name)
+        newArea['name'] = str(placemark.extended_data.elements[0].data[0]['value']) + ' - ' + str(placemark.extended_data.elements[0].data[3]['value']) 
         newArea['coords'] = list(placemark.geometry.exterior.coords)
         areas.append(newArea)
 
