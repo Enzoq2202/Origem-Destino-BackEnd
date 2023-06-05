@@ -55,14 +55,18 @@ def response_parser(response):
     routes_distanceMeters = []
     routes_duration = []
     routes_encodedPolyline = []
-    
-    routes_info =  response["routes"]
-    for route in routes_info:
-        routes_distanceMeters.append(route["distanceMeters"])
-        routes_duration.append(route["duration"])
-        routes_encodedPolyline.append(route["polyline"]["encodedPolyline"])
-    
-    return {"DistanceMeters": routes_distanceMeters, "Duration": routes_duration, "EncodedRoutes": routes_encodedPolyline}
 
+    try:
+        routes_info = response.get("routes")
+        if routes_info:
+            for route in routes_info:
+                routes_distanceMeters.append(route.get("distanceMeters"))
+                routes_duration.append(route.get("duration"))
+                routes_encodedPolyline.append(route.get("polyline", {}).get("encodedPolyline"))
+    except KeyError:
+        # Trate aqui o caso em que a chave 'routes' não está presente
+        return {"DistanceMeters": [], "Duration": [], "EncodedRoutes": []}
+
+    return {"DistanceMeters": routes_distanceMeters, "Duration": routes_duration, "EncodedRoutes": routes_encodedPolyline}
 
 
