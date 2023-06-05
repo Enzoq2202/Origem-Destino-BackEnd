@@ -13,7 +13,7 @@ conn.execute('''CREATE TABLE MinhaTabela (
     TravelMode TEXT,
     EncodedRoutes TEXT,
     DistanceMeters REAL,
-    Duration TEXT
+    Duration TEXT,
 );''')
 
 
