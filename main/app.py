@@ -4,9 +4,13 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from helpers.helpers import route_request, response_parser
-from flask import request
+from fastkml import kml
+from flask_cors import CORS  
+from shapely.geometry import Point, Polygon
 
+print('Iniciando API...')
 app = Flask(__name__)
+CORS(app)
 
 #Obtendo Path do DB
 FILE = Path(__file__).resolve()
@@ -30,11 +34,27 @@ def rota():
 
     # Fazendo a requisição na API do Google Maps
     response = route_request(data['LatitudeOrigem'], data['LongitudeOrigem'],data['LatitudeDestino'],data['LongitudeDestino'],data['TravelMode'], api_key)
-    print(response)
 
     #Parseando a resposta
     parsed_response = response_parser(response)
 
+    # Verificando região origem
+    p1 = Point( data['LongitudeOrigem'], data['LatitudeOrigem'])
+    areaOrig = 'none'
+    respArea = kml_areas()['areas']
+    for area in respArea:
+        poly = Polygon(area['coords'])
+        if poly.contains(p1):
+            areaOrig = area['name']
+
+    # Verificando região destino
+    p2 = Point( data['LongitudeDestino'], data['LatitudeDestino'])
+    areaDest = 'none'
+    respArea = kml_areas()['areas']
+    for area in respArea:
+        poly = Polygon(area['coords'])
+        if poly.contains(p2):
+            areaDest = area['name']
 
     #Inserindo dados na tabela
     conn.execute('''INSERT INTO MinhaTabela (
@@ -45,8 +65,10 @@ def rota():
         TravelMode,
         EncodedRoutes,
         DistanceMeters,
-        Duration
-    ) VALUES (?,?,?,?,?,?,?,?)''', (
+        Duration,
+        AreaOrigem,
+        AreaDestino
+    ) VALUES (?,?,?,?,?,?,?,?,?,?)''', (
         data['LatitudeOrigem'],
         data['LongitudeOrigem'],
         data['LatitudeDestino'],
@@ -54,7 +76,9 @@ def rota():
         data['TravelMode'],
         parsed_response['EncodedRoutes'][0],
         parsed_response['DistanceMeters'][0],
-        parsed_response['Duration'][0]
+        parsed_response['Duration'][0],
+        areaOrig,
+        areaDest
     ))
 
     #Salva as alterações
@@ -84,36 +108,97 @@ def rotas():
 
     #Percorrendo dados da tabela
     for row in cursor:
-        # filtrnado por modo de viagem
-        if travel_mode is None or travel_mode == row[5]:
-            # filtrando por duração minimia
-            if duration_min == None or duration_min <= row[8]:
-                # filtrando por duração máxima
-                if duration_max == None or duration_max >= row[8]:
-        
-                    #Criando dicionário de rota
-                    rota = {
-                        'id': row[0],
-                        'latitudeOrigem': row[1],
-                        'longitudeOrigem': row[2],
-                        'latitudeDestino': row[3],
-                        'longitudeDestino': row[4],
-                        'travelMode': row[5],
-                        'encodedRoutes': row[6],
-                        'distanceMeters': row[7],
-                        'duration': row[8],
+        #Criando dicionário de rota
+        rota = {
+            'id': row[0],
+            'latitudeOrigem': row[1],
+            'longitudeOrigem': row[2],
+            'latitudeDestino': row[3],
+            'longitudeDestino': row[4],
+            'travelMode': row[5],
+            'encodedRoutes': row[6],
+            'distanceMeters': row[7],
+            'duration': row[8],
+            'areaOrigem': row[9],
+            'areaDestino': row[10]
+        }
 
-                    }
-
-                    #Adicionando rota na lista de rotas
-                    rotas.append(rota)
+        #Adicionando rota na lista de rotas
+        rotas.append(rota)
 
     #Fecha a conexão
     conn.close()
     #Retorna lista de rotas
     return {'rotas': rotas}
 
+# ------------------------------------------------- #
 
+@app.route('/areas', methods=['GET'])
+def kml_areas():
+
+    kml_file = 'main/db/LL_WGS84_KMZ_distrito.kml'
+
+    with open(kml_file, 'rb') as f:
+        kml_document = f.read()
+
+    k = kml.KML()
+    k.from_string(kml_document)
+
+    placemarks = []
+    root = list(k.features())[0]  # Access the root feature (Document)
+    folder = list(root.features())[0]  # Access the first nested feature (Folder)
+    for feature in folder.features():  # Iterate over features within the nested Folder
+        if isinstance(feature, kml.Placemark):
+            placemarks.append(feature)
+
+    areas = []
+    for placemark in placemarks:
+        newArea = {}
+        newArea['name'] = str(placemark.extended_data.elements[0].data[0]['value']) + ' - ' + str(placemark.extended_data.elements[0].data[3]['value']) 
+        newArea['coords'] = list(placemark.geometry.exterior.coords)
+        areas.append(newArea)
+
+    return { 'areas': areas }
+
+# ------------------------------------------------- #
+
+app.route('/rota/<int:id>/', methods=['DELETE'])
+def delete_rota(id):
+    #Criando a conexão com o banco de dados
+    conn = sqlite3.connect(db)
+
+    #Deletando rota
+    conn.execute('''DELETE FROM MinhaTabela WHERE id = ?''', (id,))
+
+    #Salva as alterações
+    conn.commit()
+
+    #Fecha a conexão
+    conn.close()
+
+    return "Rota deletada com sucesso!"
+
+app.add_url_rule('/rota/<int:id>/', view_func=delete_rota, methods=['DELETE'])
+
+# ------------------------------------------------- #
+
+@app.route('/rota', methods=['DELETE'])
+def delete_todas_rotas():
+    #Criando a conexão com o banco de dados
+    conn = sqlite3.connect(db)
+
+    #Deletando rota
+    conn.execute('''DELETE FROM MinhaTabela''')
+
+    #Salva as alterações
+    conn.commit()
+
+    #Fecha a conexão
+    conn.close()
+
+    return "Todas as rotas foram deletadas com sucesso!"
+
+# ------------------------------------------------- #
 
 if __name__ == '__main__':
     app.run(debug=True)
