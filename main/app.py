@@ -45,7 +45,7 @@ def rota():
         TravelMode,
         EncodedRoutes,
         DistanceMeters,
-        Duration,
+        Duration
     ) VALUES (?,?,?,?,?,?,?,?)''', (
         data['LatitudeOrigem'],
         data['LongitudeOrigem'],
@@ -54,7 +54,7 @@ def rota():
         data['TravelMode'],
         parsed_response['EncodedRoutes'][0],
         parsed_response['DistanceMeters'][0],
-        parsed_response['Duration'][0],
+        parsed_response['Duration'][0]
     ))
 
     #Salva as alterações
@@ -102,7 +102,7 @@ def rotas():
                         'encodedRoutes': row[6],
                         'distanceMeters': row[7],
                         'duration': row[8],
-                        "area": row[9],
+
                     }
 
                     #Adicionando rota na lista de rotas
