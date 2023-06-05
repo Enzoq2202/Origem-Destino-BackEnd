@@ -142,3 +142,23 @@ def kml_areas():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+# ------------------------------------------------- #
+
+app.route('/rota/<int:id>', methods=['DELETE'])
+def delete_rota(id):
+    #Criando a conexão com o banco de dados
+    conn = sqlite3.connect(db)
+
+    #Deletando rota
+    conn.execute('''DELETE FROM MinhaTabela WHERE id = ?''', (id,))
+
+    #Salva as alterações
+    conn.commit()
+
+    #Fecha a conexão
+    conn.close()
+
+    return "Rota deletada com sucesso!"
+
+# ------------------------------------------------- #
