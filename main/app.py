@@ -140,5 +140,45 @@ def kml_areas():
 
     return { 'areas': areas }
 
+# ------------------------------------------------- #
+
+app.route('/rota/<int:id>/', methods=['DELETE'])
+def delete_rota(id):
+    #Criando a conexão com o banco de dados
+    conn = sqlite3.connect(db)
+
+    #Deletando rota
+    conn.execute('''DELETE FROM MinhaTabela WHERE id = ?''', (id,))
+
+    #Salva as alterações
+    conn.commit()
+
+    #Fecha a conexão
+    conn.close()
+
+    return "Rota deletada com sucesso!"
+
+app.add_url_rule('/rota/<int:id>/', view_func=delete_rota, methods=['DELETE'])
+
+# ------------------------------------------------- #
+
+@app.route('/rota', methods=['DELETE'])
+def delete_todas_rotas():
+    #Criando a conexão com o banco de dados
+    conn = sqlite3.connect(db)
+
+    #Deletando rota
+    conn.execute('''DELETE FROM MinhaTabela''')
+
+    #Salva as alterações
+    conn.commit()
+
+    #Fecha a conexão
+    conn.close()
+
+    return "Todas as rotas foram deletadas com sucesso!"
+
+# ------------------------------------------------- #
+
 if __name__ == '__main__':
     app.run(debug=True)
