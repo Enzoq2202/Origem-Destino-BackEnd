@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
 # ------------------------------------------------- #
 
-app.route('/rota/<int:id>', methods=['DELETE'])
+app.route('/rota/<int:id>/', methods=['DELETE'])
 def delete_rota(id):
     #Criando a conexão com o banco de dados
     conn = sqlite3.connect(db)
@@ -162,3 +162,23 @@ def delete_rota(id):
     return "Rota deletada com sucesso!"
 
 # ------------------------------------------------- #
+
+@app.route('/rota', methods=['DELETE'])
+def delete_todas_rotas():
+    #Criando a conexão com o banco de dados
+    conn = sqlite3.connect(db)
+
+    #Deletando rota
+    conn.execute('''DELETE FROM MinhaTabela''')
+
+    #Salva as alterações
+    conn.commit()
+
+    #Fecha a conexão
+    conn.close()
+
+    return "Todas as rotas foram deletadas com sucesso!"
+
+# ------------------------------------------------- #
+
+
