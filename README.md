@@ -6,10 +6,12 @@ Autores: Enzo Quental, Esdras Gomes, Júlia Karine, Júlia Paiva, Tomás Alessi
 
 O PTV-SP é uma ferramenta de análise origem-destino, para visualizar o deslocamento de professores na cidade de São Paulo. Com ela, é possível analisar:
  
-- rotas de deslocamento dos professores;
-- meios de transporte utilizados;
-- tempo médio que o docente leva para chegar até a escola;
-- deslocamentos de grupos.
+- analisar rotas de deslocamento dos professores;
+- visualizar meios de transporte utilizados;
+- encontrar o tempo médio que o docente leva para chegar até a escola;
+- detectar deslocamentos de grupos;
+- inserir novas rotas;
+- deletar rotas.
 
 1. Como executar o projeto?
 
