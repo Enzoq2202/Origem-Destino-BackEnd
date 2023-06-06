@@ -248,21 +248,18 @@ def macroAreas():
     addedPaths = []
     for row in cursor:
 
-        start = row[9]
-        end = row[10]
-        name = start +" // "+ end
+        startName = row[9]
+        endName = row[10]
+        name = startName +" // "+ endName
 
-        if (start != end) and (start != 'none') and (end != 'none'):
+        if (startName != endName) and (startName != 'none') and (endName != 'none'):
 
             if name not in addedPaths:
                 addedPaths.append(name)
 
-                startCoords = midpoints[start]
-                endCoords = midpoints[end]
-                
-                offset = (random.randint(0, 2)-1)/1000
-                midpoint = [(startCoords[0]+endCoords[0])/2 +offset, (startCoords[1]+endCoords[1])/2 +offset]
-                path = [startCoords, midpoint, endCoords]
+                startCoords = midpoints[startName]
+                endCoords = midpoints[endName]
+                path = [startCoords, endCoords]
 
                 newDict = {'route': path, 'name': name, 'people':1}
                 areaRoutes.append(newDict)
