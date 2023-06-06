@@ -1,7 +1,7 @@
 from flask import Flask, make_response, request
 import sqlite3
 from pathlib import Path
-import os
+import os, random
 from dotenv import load_dotenv
 from helpers.helpers import route_request, response_parser
 from fastkml import kml
@@ -245,27 +245,32 @@ def macroAreas():
     cursor = conn.execute('''SELECT * FROM MinhaTabela''')
 
     areaRoutes = []
-    haveRoute = []
+    addedPaths = []
     for row in cursor:
 
         start = row[9]
         end = row[10]
+        name = start +" // "+ end
 
         if (start != end) and (start != 'none') and (end != 'none'):
-            startCoords = midpoints[start]
-            endCoords = midpoints[end]
 
-            # midpoint and offset calcs here ================ TODO
+            if name not in addedPaths:
+                addedPaths.append(name)
 
-            path = [startCoords, endCoords]
-            if path not in haveRoute:
-                haveRoute.append(path)
-                newDict = {'route': path, 'name': (start+" // "+end), 'people':1}
+                startCoords = midpoints[start]
+                endCoords = midpoints[end]
+                
+                offset = (random.randint(0, 2)-1)/1000
+                midpoint = [(startCoords[0]+endCoords[0])/2 +offset, (startCoords[1]+endCoords[1])/2 +offset]
+                path = [startCoords, midpoint, endCoords]
+
+                newDict = {'route': path, 'name': name, 'people':1}
                 areaRoutes.append(newDict)
+
             else:
-                for items in areaRoutes:
-                    if items['route'] == path:
-                        items['people'] += 1
+                for item in areaRoutes:
+                    if item['name'] == name:
+                        item['people'] += 1
 
     conn.close()
     return {'routes': areaRoutes}
