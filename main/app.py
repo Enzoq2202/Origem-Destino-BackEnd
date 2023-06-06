@@ -111,49 +111,56 @@ def rota():
 
 @app.route('/rota', methods=['GET'])
 def rotas():
-    # Obtendo o travelMode dos parâmetros da query
-    travel_mode = request.args.get('travelMode')
-    
+
     # Criando a conexão com o banco de dados
     conn = sqlite3.connect(db)
     # Obtendo dados da tabela
-    cursor = conn.execute('''SELECT * FROM MinhaTabela WHERE TravelMode = ?''', (travel_mode,)) if travel_mode else conn.execute('''SELECT * FROM MinhaTabela''')
-    
-    #Obtendo os valor dos parâmetro da query
+    cursor = conn.execute('''SELECT * FROM MinhaTabela''')
+
+
     travel_mode = request.args.get('travel_mode')
- 
     duration_max = request.args.get('duration_max')
-    duration_min= request.args.get('duration_min')
+
+    duration_min = request.args.get('duration_min')
+    distance_max = request.args.get('distance_max')
+    distance_min = request.args.get('distance_min')
+
+
     # Criando lista de rotas
     rotas = []
     # Percorrendo dados da tabela
     for row in cursor:
-        # filtrnado por modo de viagem
+        # Filtrando por modo de viagem
         if travel_mode is None or travel_mode == row[5]:
-            # filtrando por duração minimia
-            if duration_min == None or duration_min <= row[8]:
-                # filtrando por duração máxima
-                if duration_max == None or duration_max >= row[8]:
-        
-                    # Criando dicionário de rota
-                    rota = {
-                        'id': row[0],
-                        'latitudeOrigem': row[1],
-                        'longitudeOrigem': row[2],
-                        'latitudeDestino': row[3],
-                        'longitudeDestino': row[4],
-                        'travelMode': row[5],
-                        'encodedRoutes': row[6],
-                        'distanceMeters': row[7],
-                        'duration': row[8],
-                        'areaOrigem': row[9],
-                        'areaDestino': row[10]
-                    }
 
-                    # Adicionando rota na lista de rotas
+            # Filtrando por duração mínima
+            if duration_min is None or int(duration_min) <= int(row[8].replace("s", "")):
+                # Filtrando por duração máxima
+                if duration_max is None or int(duration_max) >= int(row[8].replace("s", "")):
+                    # Filtrando por distância mínima
+                    if distance_min is None or int(distance_min) <= int(row[7]):
+                        # Filtrando por distância máxima
+                        if distance_max is None or int(distance_max) >= int(row[7]):
+                          # Criando dicionário de rota
+                          rota = {
+                              'id': row[0],
+                              'latitudeOrigem': row[1],
+                              'longitudeOrigem': row[2],
+                              'latitudeDestino': row[3],
+                              'longitudeDestino': row[4],
+                              'travelMode': row[5],
+                              'encodedRoutes': row[6],
+                              'distanceMeters': row[7],
+                              'duration': row[8],
+                              'areaOrigem': row[9],
+                              'areaDestino': row[10]
+                          }
+
+                          # Adicionando rota na lista de rotas
 
 
-                    rotas.append(rota)
+                          rotas.append(rota)
+
     # Fecha a conexão
     conn.close()
 
@@ -161,6 +168,8 @@ def rotas():
     response = make_response({'rotas': rotas})
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
+
+
 
 # ------------------------------------------------- #
 
