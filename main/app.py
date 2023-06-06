@@ -91,49 +91,53 @@ def rota():
 
 @app.route('/rota', methods=['GET'])
 def rotas():
-    #Criando a conexão com o banco de dados
+    # Criando a conexão com o banco de dados
     conn = sqlite3.connect(db)
-    #Obtendo dados da tabela
+    # Obtendo dados da tabela
     cursor = conn.execute('''SELECT * FROM MinhaTabela''')
-    
-    #Obtendo os valor dos parâmetro da query
+
+    # Obtendo os valores dos parâmetros da query
     travel_mode = request.args.get('travel_mode')
- 
     duration_max = request.args.get('duration_max')
-    duration_min= request.args.get('duration_min')
-    #Criando lista de rotas
+    duration_min = request.args.get('duration_min')
+    distance_max = request.args.get('distance_max')
+    distance_min = request.args.get('distance_min')
+
+    # Criando lista de rotas
     rotas = []
-    #Percorrendo dados da tabela
+    # Percorrendo dados da tabela
     for row in cursor:
-        # filtrnado por modo de viagem
+        # Filtrando por modo de viagem
         if travel_mode is None or travel_mode == row[5]:
-            # filtrando por duração minimia
-            if duration_min == None or duration_min <= row[8]:
-                # filtrando por duração máxima
-                if duration_max == None or duration_max >= row[8]:
-        
-                    #Criando dicionário de rota
-                    rota = {
-                        'id': row[0],
-                        'latitudeOrigem': row[1],
-                        'longitudeOrigem': row[2],
-                        'latitudeDestino': row[3],
-                        'longitudeDestino': row[4],
-                        'travelMode': row[5],
-                        'encodedRoutes': row[6],
-                        'distanceMeters': row[7],
-                        'duration': row[8],
-                        "area": row[9],
-                    }
+            # Filtrando por duração mínima
+            if duration_min is None or int(duration_min) <= int(row[8].replace("s", "")):
+                # Filtrando por duração máxima
+                if duration_max is None or int(duration_max) >= int(row[8].replace("s", "")):
+                    # Filtrando por distância mínima
+                    if distance_min is None or int(distance_min) <= int(row[7]):
+                        # Filtrando por distância máxima
+                        if distance_max is None or int(distance_max) >= int(row[7]):
+                            # Criando dicionário de rota
+                            rota = {
+                                'id': row[0],
+                                'latitudeOrigem': row[1],
+                                'longitudeOrigem': row[2],
+                                'latitudeDestino': row[3],
+                                'longitudeDestino': row[4],
+                                'travelMode': row[5],
+                                'encodedRoutes': row[6],
+                                'distanceMeters': row[7],
+                                'duration': row[8],
+                                "area": row[9],
+                            }
+                            # Adicionando rota na lista de rotas
+                            rotas.append(rota)
 
-                    #Adicionando rota na lista de rotas
-
-
-                    rotas.append(rota)
-    #Fecha a conexão
+    # Fecha a conexão
     conn.close()
-    #Retorna lista de rotas
+    # Retorna lista de rotas
     return {'rotas': rotas}
+
 
 # ------------------------------------------------- #
 
