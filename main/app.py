@@ -255,6 +255,7 @@ def macroAreas():
 
     areaRoutes = []
     addedPaths = []
+    idNumb = 1
     for row in cursor:
 
         startName = row[9]
@@ -270,8 +271,9 @@ def macroAreas():
                 endCoords = midpoints[endName]
                 path = [startCoords, endCoords]
 
-                newDict = {'route': path, 'name': name, 'people':1}
+                newDict = {'route': path, 'name': name, 'people':1, 'id':idNumb}
                 areaRoutes.append(newDict)
+                idNumb += 1
 
             else:
                 for item in areaRoutes:
