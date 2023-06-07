@@ -176,7 +176,7 @@ def rotas():
 @app.route('/areas', methods=['GET'])
 def kml_areas():
 
-    kml_file = 'main\db\LL_WGS84_KMZ_distrito.kml'
+    kml_file = './main/db/LL_WGS84_KMZ_distrito.kml'
 
     with open(kml_file, 'rb') as f:
         kml_document = f.read()
