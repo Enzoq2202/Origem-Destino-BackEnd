@@ -20,3 +20,20 @@ Acesse o link da versão executável do projeto: http://projeto-origem-destino.s
 2. Dependências
 
 Construímos o backend em Flask e o frontend usando React e CSS. Como banco de dados, decidimos usar o Sqlite3. Em relação ao mapa, utilizamos o Leaflet, uma biblioteca em JavaScript de mapas interativos. A lista completa de dependências pode ser encontrada no arquivo "requirements.txt".
+
+# Documentação
+
+### Rotas
+
+- /rota (GET)
+    - Retorna uma lista de todas as rotas cadastradas na database. Consegue receber os argumentos: duration_min, duration_max, distance_min, distance_max, travel_mode.
+- /rota (POST)
+    - Recebe 5 argumentos, transforma esses dados em uma rota e salva ele na database. Argumentos: LatitudeOrigem, LongitudeOrigem, LatitudeDestino, LongitudeDestino, TravelMode.
+- /rota (DELETE)
+    - Remove todas as rotas da database.
+- /rota/id (DELETE)
+    - Remove a rota correspondente ao ID no url da database.
+- /areas (GET)
+    - Retorna uma lista de áreas de São Paulo (polígonos ditados por pontos no seu perímetro), com os seus respectivos nomes e regiôes.
+- /macro (GET)
+    - Retorna uma lista de rotas, onde o seu inicio é o ponto central de uma área e o final é centro de outra. Representa a migração de pessoas entre áreas diferentes, e tem um contador para quantidade de pessoas que se movimentam.
